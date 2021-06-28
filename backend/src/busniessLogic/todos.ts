@@ -4,7 +4,6 @@ import { TodoAccess } from '../dataAccess/todoAccess'
 import { TodoItem } from '../models/TodoItem'
 import { CreateTodoRequest } from '../requests/CreateTodoRequest'
 import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
-import { createLogger } from '../utils/logger'
 
 const todoAccess = new TodoAccess()
 
@@ -26,7 +25,6 @@ export async function createTodo(
 ) {
   const todoId = uuid.v4()
   const userId = parseUserId(jwtToken)
-  createLogger('userId:' + userId)
   const newTodo: TodoItem = {
     todoId: todoId,
     userId: userId,
