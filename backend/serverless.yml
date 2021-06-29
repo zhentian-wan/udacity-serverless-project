@@ -17,10 +17,10 @@ custom:
     models:
       - name: CreateRequest
         contentType: application/json
-        schema: ${file(model-validators/create-todo-request.json)}
+        schema: ${file(models/create-todo-request.json)}
       - name: UpdateRequest
         contentType: application/json
-        schema: ${file(model-validators/update-todo-request.json)}
+        schema: ${file(models/update-todo-request.json)}
 
 provider:
   name: aws
@@ -234,7 +234,6 @@ resources:
           - AttributeName: todoId # sort key
             AttributeType: S
         KeySchema:
-          # 1:M (One user -> Many todos)
           - AttributeName: userId
             KeyType: HASH # partition key
           - AttributeName: todoId
