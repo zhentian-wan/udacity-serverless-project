@@ -11,6 +11,14 @@ const logger = createLogger('createTodo')
 export const handler = middy(
   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     const newTodo: CreateTodoRequest = JSON.parse(event.body)
+
+    if (!newTodo.name || newTodo.name.length < 1) {
+      return {
+        statusCode: 400,
+        body: 'Todo name is required'
+      }
+    }
+
     logger.info('newTodo: ' + newTodo)
     const authorization = event.headers.Authorization
     logger.info('authorization: ' + authorization)
