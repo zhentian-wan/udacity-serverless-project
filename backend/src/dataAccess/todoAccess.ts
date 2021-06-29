@@ -5,25 +5,55 @@ import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
 export class TodoAccess {
   constructor(
     private readonly docClient: DocumentClient = new AWS.DynamoDB.DocumentClient(),
-    private readonly todosTable = process.env.TODOS_TABLE
+    private readonly todosTable = process.env.TODOS_TABLE,
+    private readonly indexTable = process.env.INDEX_TABLE
   ) {}
 
-  async getAllTodos(): Promise<TodoItem[]> {
+  async appendTodoUrl(
+    userId: string,
+    todoId: string,
+    url: string
+  ): Promise<any> {
+    return await this.docClient
+      .update({
+        TableName: this.todosTable,
+        Key: {
+          todoId,
+          userId
+        },
+        UpdateExpression: 'SET #attachmentUrl= :url',
+        ExpressionAttributeNames: {
+          '#attachmentUrl': 'attachmentUrl'
+        },
+        ExpressionAttributeValues: {
+          ':url': url
+        },
+        ReturnValues: 'ALL_NEW'
+      })
+      .promise()
+  }
+
+  async getAllTodos(userId: string): Promise<TodoItem[]> {
     const result = await this.docClient
-      .scan({
-        TableName: this.todosTable
+      .query({
+        TableName: this.todosTable,
+        IndexName: this.indexTable,
+        KeyConditionExpression: 'userId = :userId',
+        ExpressionAttributeValues: { ':userId': userId },
+        ScanIndexForward: false
       })
       .promise()
     const items = result.Items
     return items as TodoItem[]
   }
 
-  async getTodoById(todoId: string): Promise<TodoItem> {
+  async getTodoById(userId: string, todoId: string): Promise<TodoItem> {
     const result = await this.docClient
       .get({
         TableName: this.todosTable,
         Key: {
-          todoId: todoId
+          todoId,
+          userId
         }
       })
       .promise()
@@ -40,17 +70,18 @@ export class TodoAccess {
     return todo
   }
 
-  async deleteTodo(todoId: string): Promise<string> {
+  async deleteTodo(userId: string, todoId: string): Promise<string> {
     await this.docClient
       .delete({
         TableName: this.todosTable,
-        Key: { todoId }
+        Key: { todoId, userId }
       })
       .promise()
     return todoId
   }
 
   async updateTodo(
+    userId: string,
     todoId: string,
     updateTodo: UpdateTodoRequest
   ): Promise<any> {
@@ -59,15 +90,17 @@ export class TodoAccess {
       .update({
         TableName: this.todosTable,
         Key: {
-          todoId: todoId
+          todoId,
+          userId
         },
-        ConditionExpression: 'attribute_exists(todoId)',
-        UpdateExpression: 'SET #N= :todoName, dueDate= :dueDate, done= :done',
+        UpdateExpression: 'SET #name= :name, #dueDate= :dueDate, #done= :done',
         ExpressionAttributeNames: {
-          '#N': 'name'
+          '#name': 'name',
+          '#dueDate': 'dueDate',
+          '#done': 'done'
         },
         ExpressionAttributeValues: {
-          ':todoName': name,
+          ':name': name,
           ':done': done,
           ':dueDate': dueDate
         },

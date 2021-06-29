@@ -27,9 +27,10 @@ provider:
     apiGateway: true
 
   environment:
-    TODOS_TABLE: Todos-${self:provider.stage}
+    TODOS_TABLE: zhentiw-Todos-${self:provider.stage}
     TODOS_S3_BUCKET: zhentiw-todos-images-udacity-serverless-${self:provider.stage}
     SIGNED_URL_EXPIRATION: 300
+    INDEX_TABLE: IndexTable-${self:provider.stage}
 
 functions:
   Auth:
@@ -52,8 +53,8 @@ functions:
           - '*'
       - Effect: Allow
         Action:
-          - dynamodb:Scan
-        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
+          - dynamodb:Query
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}/index/${self:provider.environment.INDEX_TABLE}
 
   CreateTodo:
     handler: src/lambda/http/createTodo.handler
@@ -137,6 +138,11 @@ functions:
           - s3:PutObject
           - s3:GetObject
         Resource: arn:aws:s3:::${self:provider.environment.TODOS_S3_BUCKET}/*
+      - Effect: Allow
+        Action:
+          - dynamodb:GetItem
+          - dynamodb:UpdateItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
 
 resources:
   Resources:
@@ -181,18 +187,6 @@ resources:
               Action: 's3:GetObject'
               Resource: 'arn:aws:s3:::${self:provider.environment.TODOS_S3_BUCKET}/*'
 
-    # TODO: Add any necessary AWS resources
-    TodosDynamoDBTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: ${self:provider.environment.TODOS_TABLE}
-        AttributeDefinitions:
-          - AttributeName: todoId
-            AttributeType: S
-        KeySchema:
-          - AttributeName: todoId
-            KeyType: HASH
-        BillingMode: PAY_PER_REQUEST
     GatewayResponseDefault4XX:
       Type: AWS::ApiGateway::GatewayResponse
       Properties:
@@ -203,3 +197,31 @@ resources:
         ResponseType: DEFAULT_4XX
         RestApiId:
           Ref: ApiGatewayRestApi
+
+    TodosDynamoDBTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: userId # partition key
+            AttributeType: S
+          - AttributeName: createdAt # index key
+            AttributeType: S
+          - AttributeName: todoId # sort key
+            AttributeType: S
+        KeySchema:
+          # 1:M (One user -> Many todos)
+          - AttributeName: userId
+            KeyType: HASH # partition key
+          - AttributeName: todoId
+            KeyType: RANGE # sort key
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${self:provider.environment.TODOS_TABLE}
+        LocalSecondaryIndexes:
+          - IndexName: ${self:provider.environment.INDEX_TABLE}
+            KeySchema:
+              - AttributeName: userId
+                KeyType: HASH # partition key
+              - AttributeName: createdAt
+                KeyType: RANGE # sort key
+            Projection:
+              ProjectionType: ALL

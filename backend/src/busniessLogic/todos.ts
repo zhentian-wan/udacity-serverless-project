@@ -7,16 +7,22 @@ import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
 
 const todoAccess = new TodoAccess()
 
-export async function getAllTodos(): Promise<TodoItem[]> {
-  return todoAccess.getAllTodos()
+export async function getAllTodos(userId: string): Promise<TodoItem[]> {
+  return todoAccess.getAllTodos(userId)
 }
 
-export async function getTodoById(todoId: string): Promise<TodoItem> {
-  return await todoAccess.getTodoById(todoId)
+export async function getTodoById(
+  userId: string,
+  todoId: string
+): Promise<TodoItem> {
+  return await todoAccess.getTodoById(userId, todoId)
 }
 
-export async function isTodoExist(todoId: string): Promise<boolean> {
-  return !!(await todoAccess.getTodoById(todoId))
+export async function isTodoExist(
+  userId: string,
+  todoId: string
+): Promise<boolean> {
+  return !!(await todoAccess.getTodoById(userId, todoId))
 }
 
 export async function createTodo(
@@ -36,13 +42,22 @@ export async function createTodo(
   return await todoAccess.createTodo(newTodo)
 }
 
-export async function deleteTodo(todoId: string) {
-  await todoAccess.deleteTodo(todoId)
+export async function deleteTodo(userId: string, todoId: string) {
+  await todoAccess.deleteTodo(userId, todoId)
 }
 
 export async function updateTodo(
+  userId: string,
   todoId: string,
   updateTodo: UpdateTodoRequest
 ) {
-  return todoAccess.updateTodo(todoId, updateTodo)
+  return todoAccess.updateTodo(userId, todoId, updateTodo)
+}
+
+export async function appendTodoUrl(
+  userId: string,
+  todoId: string,
+  url: string
+) {
+  return todoAccess.appendTodoUrl(userId, todoId, url)
 }

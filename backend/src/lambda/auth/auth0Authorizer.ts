@@ -80,7 +80,7 @@ function certToPEM(cert) {
   return cert
 }
 
-function getToken(authHeader: string): string {
+export function getToken(authHeader: string): string {
   if (!authHeader) throw new Error('No authentication header')
 
   if (!authHeader.toLowerCase().startsWith('bearer '))
