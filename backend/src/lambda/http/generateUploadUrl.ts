@@ -25,11 +25,11 @@ export const handler = middy(
   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     const userId = getUserId(event)
     const todoId = event.pathParameters.todoId
-    logger.info('todoId', todoId)
+    logger.info('todoId: ' + todoId)
     const url = getUploadUrl(todoId)
-    logger.info('url', url)
+    logger.info('url:' + url)
     const todoExist = await isTodoExist(userId, todoId)
-    logger.info('todoExist', todoExist)
+    logger.info('todoExist: ' + todoExist)
     if (!todoExist) {
       return {
         statusCode: 400,

@@ -11,11 +11,11 @@ const logger = createLogger('updateTodo')
 export const handler = middy(
   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     const userId = getUserId(event)
-    logger.info('userId', userId)
+    logger.info('userId: ' + userId)
     const todoId = event.pathParameters.todoId
-    logger.info('todoId', todoId)
+    logger.info('todoId: ' + todoId)
     const updatedTodo: UpdateTodoRequest = JSON.parse(event.body)
-    logger.info('updatedTodo', updatedTodo)
+    logger.info('updatedTodo: ' + updatedTodo)
     if (!todoId) {
       return {
         statusCode: 400,
