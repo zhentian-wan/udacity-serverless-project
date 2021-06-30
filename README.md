@@ -6,8 +6,11 @@ To implement this project, you need to implement a simple TODO application using
 
 ### Endpoints
 
-GET: https://${apiId}.execute-api.us-east-1.amazonaws.com/dev/todos
-POST: https://{{apiId}}.execute-api.us-east-1.amazonaws.com/dev/todos
+GET - https://08shvb1nbg.execute-api.us-east-1.amazonaws.com/dev/todos
+POST - https://08shvb1nbg.execute-api.us-east-1.amazonaws.com/dev/todos
+PATCH - https://08shvb1nbg.execute-api.us-east-1.amazonaws.com/dev/todos/{todoId}
+DELETE - https://08shvb1nbg.execute-api.us-east-1.amazonaws.com/dev/todos/{todoId}
+POST - https://08shvb1nbg.execute-api.us-east-1.amazonaws.com/dev/todos/{todoId}/attachment
 
 ### Docker
 
@@ -23,6 +26,7 @@ Open `http://localhost:3000` to use the application.
 ### Travis
 
 Using `.travis.yml` to deploy docker image to DockerHub.
+
 ![Travis](./screenshots/travis.png)
 ![DockerHub](./screenshots/dockerhub.png)
 
