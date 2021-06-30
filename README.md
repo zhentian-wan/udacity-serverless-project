@@ -11,6 +11,8 @@ POST: https://{{apiId}}.execute-api.us-east-1.amazonaws.com/dev/todos
 
 ### Docker
 
+For `client` application.
+
 ```bash
 docker build -t sample .
 docker run -it --rm -p 3000:80 sample
@@ -21,6 +23,8 @@ Open `http://localhost:3000` to use the application.
 ### Travis
 
 Using `.travis.yml` to deploy docker image to DockerHub.
+![Travis](./screenshots/travis.png)
+![DockerHub](./screenshots/dockerhub.png)
 
 ### Application
 
