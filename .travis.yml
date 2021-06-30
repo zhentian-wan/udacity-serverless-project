@@ -15,6 +15,7 @@ before_script:
 
 script:
   - docker --version # print the version for logging
+  - cd client
   - docker build -t serverless-frontend .
   - docker tag serverless-frontend zhentian/serverless-frontend
 
